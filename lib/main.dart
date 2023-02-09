@@ -1,5 +1,8 @@
+// ignore_for_file: sized_box_for_whitespace
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -16,8 +19,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
-      ),
+          //primarySwatch: Color.fromARGB(100, 2, 125, 253),
+          ),
       home: const MyHomePage(),
     );
   }
@@ -31,6 +34,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int activeIndex = 0;
+
   final List<String> imgList = [
     'assets/images/vk.png',
     'assets/images/inst.png',
@@ -53,21 +58,52 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: const Color.fromRGBO(2, 125, 243, 1),
         title: const Text('CAROUSEL TUTORIAL'),
       ),
       body: Center(
-        child: CarouselSlider.builder(
-            options: CarouselOptions(height: 300),
-            itemCount: imgList.length,
-            itemBuilder: (context, index, realIndex) {
-              return MyTile(
-                image: imgList[index],
-                press: () => openInBrowser(urlList[index]),
-              );
-            }),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CarouselSlider.builder(
+                options: CarouselOptions(
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        activeIndex = index;
+                      });
+                    },
+                    height: 200),
+                itemCount: imgList.length,
+                itemBuilder: (context, index, realIndex) {
+                  return MyTile(
+                    image: imgList[index],
+                    press: () => openInBrowser(urlList[index]),
+                  );
+                }),
+            const SizedBox(height: 5),
+            buildIndicator(),
+          ],
+        ),
       ),
     );
   }
+
+  Widget buildIndicator() => AnimatedSmoothIndicator(
+        activeIndex: activeIndex,
+        count: imgList.length,
+        effect: const JumpingDotEffect(
+          dotColor: Colors.grey,
+          dotHeight: 15,
+          dotWidth: 15,
+          activeDotColor: Color.fromRGBO(
+            2,
+            125,
+            243,
+            1,
+          ),
+        ),
+      );
 }
 
 class MyTile extends StatelessWidget {
